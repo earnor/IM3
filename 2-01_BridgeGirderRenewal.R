@@ -16,6 +16,7 @@ rm(list=ls())     # clear the memory and items in R console
 library(ggplot2)  # load ggplot graphics package.
 library(tidyr)
 
+# The working directory must be set to wherever you keep your files
 setwd("Y:/common/IBI/Martani/IM Script - Workspace/Exercises/R-files/Updated")
 ### ------------------VARIABLE DEFINITION---------------------
 
@@ -170,6 +171,10 @@ result    <- data.frame("Cons1:Weibull"=eta.w
                         ,"Cons2:Exponential"=eta.e)
 print(result)
 
+### --------------------PLOT--------------------
+## The following code is only for plotting the figure given as 
+## a solution to the Exercise
+
 tmin <- 0
 tmax <- 4
 t=seq(tmin,tmax,length=l)
@@ -194,15 +199,11 @@ results <- data.frame(t
                       ,f.a.e,f.a.w,f.b.e,f.b.w
                       ,F.a.e,F.a.w,F.b.e,F.b.w)
 resultstidy <- gather(results
-                  ,f.a.e,f.a.w,f.b.e,f.b.w
-                  ,F.a.e,F.a.w,F.b.e,F.b.w
-                  ,key="key",value="value")
+                      ,f.a.e,f.a.w,f.b.e,f.b.w
+                      ,F.a.e,F.a.w,F.b.e,F.b.w
+                      ,key="key",value="value")
 resultsf <- resultstidy[1:(nrow(resultstidy)/2),]
 resultsF <- resultstidy[(nrow(resultstidy)/2)+1:nrow(resultstidy),]
-
-### --------------------PLOT--------------------
-## The following code is only for plotting the figure given as 
-## a solution to the Exercise
 
 plotpdf <- ggplot(data=resultsf
                   , aes(x=t,y=value,group=key,color=key)) +
