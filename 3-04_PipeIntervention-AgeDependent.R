@@ -106,6 +106,7 @@ ploteta <- ggplot(data=plotres,aes(x=T,y=eta),color="red") +
   geom_line(size=2,color="red") + 
   xlab("Time between Int. [tu]") + 
   ylab("Average cost per year [mu/tu]") + # Set axis labels
+  scale_x_continuous(breaks = seq(0, max(plotres$T), by = 100)) +
   ylim(0,0.05) +
   theme_bw(base_size=36)
 
@@ -119,6 +120,14 @@ data <- plotres
 optimal[1,1] <- data$T[which.min(data$eta)]
 optimal[1,2] <- min(data$eta)
 
+optlines <- data.frame(key = c("z","z")
+                       , x0 = c(min(plotres$T)
+                                ,optimal$x)
+                       , x1 = c(optimal$x
+                                ,optimal$x)
+                       , y0 = c(optimal$y,optimal$y)
+                       , y1 = c(optimal$y,0))
+
 # Now we add these points to the graph before exporting
 ploteta + geom_point(data=optimal
                      , aes(x=x
@@ -126,8 +135,13 @@ ploteta + geom_point(data=optimal
                      , colour="navyblue"
                      , size=6) +
   annotate("text", label="Optimal - 0.0078\nT=192"
-           , x=optimal[1,1]+0.02, y=optimal[1,2]-0.003
-           , size=12)
+           , x=optimal[1,1]+0.02, y=optimal[1,2]+0.006
+           , size=12) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
 dev.copy(png,'E3-04_eta.png',width=2000,height=1330)
 dev.off()

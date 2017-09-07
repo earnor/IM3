@@ -361,6 +361,7 @@ plottime <- ggplot(data=timetidy,aes(x=T,y=value
   )  +                  
   xlab("Time between Int. [years]") + 
   ylab("Average cost per year [10^3 mu/yr]") + # Set axis labels
+  scale_x_continuous(breaks = seq(0, max(timetidy$T), by = 2)) +
   ylim(0,5) +
   theme_bw(base_size=36) + 
   theme(legend.position=c(.85, .8))          
@@ -378,13 +379,27 @@ for (n in 1:5)
   optimal[n,1] <- type[n]
   optimal[n,2] <- data$T[which.min(data$value)]
   optimal[n,3] <- min(data$value)
+  opt <- data.frame(key = c("z","z")
+                    , x0 = c(min(data$T)
+                             ,optimal$x[n])
+                    , x1 = c(optimal$x[n]
+                             ,optimal$x[n])
+                    , y0 = c(optimal$y[n],optimal$y[n])
+                    , y1 = c(optimal$y[n],0))
+  if      (n==1) { optlines <- opt} 
+  else if (n!=1) { optlines <- rbind(optlines,opt)}
 }
 # Now we add these points to the graph before exporting
 plottime + geom_point(data=optimal
                       , aes(x=x
                             , y=y)
                       , colour="navyblue"
-                      , size=6)
+                      , size=6) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
 dev.copy(png,'E3-03b_time.png',width=2000,height=1330)
 dev.off()
@@ -407,6 +422,7 @@ plotage <- ggplot(data=agetidy,aes(x=T,y=value
   # scale_linetype_discrete(name="Pipe and Model type") +
   xlab("Time between Int. [years]") + 
   ylab("Average cost per year [10^3 mu/yr]") + # Set axis labels
+  scale_x_continuous(breaks = seq(0, max(agetidy$T), by = 2)) +
   ylim(0,5) +
   theme_bw(base_size=36) + 
   theme(legend.position=c(.85, .8))           # Position legend
@@ -423,13 +439,27 @@ for (n in 1:5)
   optimal[n,1] <- type[n]
   optimal[n,2] <- data$T[which.min(data$value)]
   optimal[n,3] <- min(data$value)
+  opt <- data.frame(key = c("z","z")
+                    , x0 = c(min(data$T)
+                             ,optimal$x[n])
+                    , x1 = c(optimal$x[n]
+                             ,optimal$x[n])
+                    , y0 = c(optimal$y[n],optimal$y[n])
+                    , y1 = c(optimal$y[n],0))
+  if      (n==1) { optlines <- opt} 
+  else if (n!=1) { optlines <- rbind(optlines,opt)}
 }
 # Now we add these points to the graph before exporting
 plotage + geom_point(data=optimal
                      , aes(x=x
                            , y=y)
                      , colour="navyblue"
-                     , size=6)
+                     , size=6) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
 dev.copy(png,'E3-03b_age.png',width=2000,height=1330)
 dev.off()

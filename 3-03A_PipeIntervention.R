@@ -112,8 +112,6 @@ cat('RESULTS FOR CAST IRON PIPE \n')
 input <- matrix(data=rep(1:T.max,each=N), ncol=N, byrow=T.max)
 m.calc <- function(T){
   i <- 0
-  
-  
   sumTn <- 0 # Sum of all failure durations, essentially sumTn=t .
   # We start at t=0
   while (sumTn<T){
@@ -262,6 +260,7 @@ ploteta <- ggplot(data=resultstidy,aes(x=T,y=value
                             , "\nDuctile iron - Age dep.\n")
   )  +                  
   scale_linetype_discrete(name="Pipe and Model type") +
+  scale_x_continuous(breaks = seq(0, max(resultstidy$T), by = 2)) +
   xlab("Time between Int. [years]") + 
   ylab("Average cost per year [10^3 mu/yr]") + # Set axis labels
   ylim(0,5) +
@@ -273,20 +272,33 @@ ploteta <- ggplot(data=resultstidy,aes(x=T,y=value
 optimal <- data.frame(NA,nrow=4,ncol=3)
 names(optimal) <- c("key","x","y")
 type <- c("Cast.TI","Cast.AI","Duct.TI","Duct.AI")
-
 for (n in 1:4)
 {
   data <- resultstidy[(1+(T.max*(n-1))):(n*T.max),]
   optimal[n,1] <- type[n]
   optimal[n,2] <- data$T[which.min(data$value)]
   optimal[n,3] <- min(data$value)
+  opt <- data.frame(key = c("z","z")
+                    , x0 = c(min(data$T)
+                             ,optimal$x[n])
+                    , x1 = c(optimal$x[n]
+                             ,optimal$x[n])
+                    , y0 = c(optimal$y[n],optimal$y[n])
+                    , y1 = c(optimal$y[n],0))
+  if      (n==1) { optlines <- opt} 
+  else if (n!=1) { optlines <- rbind(optlines,opt)}
 }
 # Now we add these points to the graph before exporting
 ploteta + geom_point(data=optimal
                      , aes(x=x
                            , y=y)
                      , colour="navyblue"
-                     , size=6)
+                     , size=6) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
 dev.copy(png,'E3-03a_eta.png',width=2000,height=1330)
 dev.off()

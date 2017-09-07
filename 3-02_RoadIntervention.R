@@ -88,6 +88,14 @@ resultstidy <- gather(results
                       ,tn.CI,tn.PI,tn.t
                       ,key="key",value="value")
 
+optlines <- data.frame(key = c("z","z")
+                       , x0 = c(min(result$t)
+                                ,which.min(result$tn.t))
+                       , x1 = c(which.min(result$tn.t)
+                                ,which.min(result$tn.t))
+                       , y0 = c(min(result$tn.t),min(result$tn.t))
+                       , y1 = c(min(result$tn.t),0))
+
 plottn <- ggplot(data=resultstidy,aes(x=t,y=value
                                       ,group=key,color=key)) + 
   geom_line(size=2) + 
@@ -98,29 +106,49 @@ plottn <- ggplot(data=resultstidy,aes(x=t,y=value
                             , "\nTotal\n")
   )  +                  
   scale_linetype_discrete(name="Type of cost") +
+  scale_x_continuous(breaks = seq(0, max(resultstidy$t), by = 1)) +
   xlab("Time between Int. [years]") + 
   ylab("Average time per year [mu/yr]") + # Set axis labels
   theme_bw(base_size=36) + 
   annotate("text", x = 3, y = 0.36
            , label = "Optimal\nt.n=0.31 at T=3"
            , size=12,color="black")
-plottn
+plottn +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 dev.copy(png,'E3-02_tn.png',width=2000,height=1330)
 dev.off()
 
 # Plot availability
 
+optlines <- data.frame(key = c("z","z")
+                       , x0 = c(min(resultstau$t)
+                                ,which.max(resultstau$tau))
+                       , x1 = c(which.max(resultstau$tau)
+                                ,which.max(resultstau$tau))
+                       , y0 = c(max(resultstau$tau)
+                                ,max(resultstau$tau))
+                       , y1 = c(max(resultstau$tau),0))
+
 plottau <- ggplot(data=resultstau,aes(x=t,y=tau)) + 
   geom_line(size=2) + 
-  
+  scale_x_continuous(breaks = seq(0, max(resultstau$t), by = 1)) +
   xlab("Time between Int. [years]") + 
   ylab("Availability") + # Set axis labels
   ylim(0,1) +
   theme_bw(base_size=36) + 
-  annotate("text", x = 3, y = 0.7
+  annotate("text", x = 3, y = 0.87
            , label = "Optimal\ntau=0.77 at T=3"
            , size=12,color="black")
-plottau
+plottau +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 dev.copy(png,'E3-02_tau.png',width=2000,height=1330)
 dev.off()
 

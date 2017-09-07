@@ -168,6 +168,7 @@ plotA <- ggplot(data=rdfAtidy,aes(x=k,y=value
                             , "\nField D\n")
   )  +
   scale_linetype_discrete(name="Oil Field") +
+  scale_x_continuous(breaks = seq(0, max(rdfAtidy$k), by = 4)) +
   xlab("k - number of failed pumps [-]") + 
   ylab("Efficiency [-]") + # Set axis labels
   ylim(0,1) +
@@ -220,6 +221,7 @@ plotchiB <- ggplot(data=rdfBtidy,aes(x=k,y=value
                             , "\nt.dI.i=8\n")
   )  +
   scale_linetype_discrete(name="Set-up time") +
+  scale_x_continuous(breaks = seq(0, max(rdfBtidy$k), by = 2)) +
   xlab("k - number of failed items [-]") + 
   ylab("Efficiency [-]") + # Set axis labels
   ylim(0,1) +

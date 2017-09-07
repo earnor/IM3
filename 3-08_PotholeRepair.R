@@ -47,7 +47,7 @@ m       <- matrix(nrow=T.max) # m collects mean number of failure m(T)
 # T is time between PIs. First we use iteration process described in 
 # the Theory to find m.n(T). In the process, the random variable g is
 # used to determine the time length in years from time point t=0 to 
-# which the object (pipe) fails. This time is represented using Tn. If
+# which the object fails. This time is represented using Tn. If
 # this time is less than the time period T, the loop reiterates to see
 # if the next failure also occurs before time T. If the next Tn brings
 # the sum of all Tn to a value that exceeds time T, the loop stops. 
@@ -107,8 +107,9 @@ names(plotres) <- c("T","eta")
 
 plottau <- ggplot(data=plotres,aes(x=T,y=eta)) + 
   geom_line(size=2,color="red") + 
-  xlab("Time between Int. [years]") + 
+  xlab("Time between PI [years]") + 
   ylab("Average cost per year [mu/yr]") + 
+  scale_x_continuous(breaks = seq(0, max(plotres$T), by = 1)) +
   ylim(0,500) +
   theme_bw(base_size=36) 
 
@@ -120,13 +121,25 @@ names(optimal) <- c("x","y")
 data <- plotres
 optimal[1,1] <- data$T[which.min(data$eta)]
 optimal[1,2] <- min(data$eta)
+optlines <- data.frame(key = c("z","z")
+                       , x0 = c(min(plotres$T)
+                                ,optimal$x)
+                       , x1 = c(optimal$x
+                                ,optimal$x)
+                       , y0 = c(optimal$y,optimal$y)
+                       , y1 = c(optimal$y,0)) # Same as y.min
 
 # Now we add these points to the graph before exporting
 plottau + geom_point(data=optimal
                      , aes(x=x
                            , y=y)
                      , colour="navyblue"
-                     , size=6)
+                     , size=6) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
 dev.copy(png,'E3-08_eta.png',width=2000,height=1330)
 dev.off()

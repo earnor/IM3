@@ -140,7 +140,16 @@ plot1 <- plot1 + scale_colour_manual(values = c("blue", "red"))
 # Label the other two axes and name the variables
 plot1 <- plot1 + labs(y = "Z(p)",
                       x = "p - probability",
-                      colour = "Variable")
+                      colour = "Variable") +
+  scale_x_continuous(breaks = seq(0, max(R$p), by = 0.1))
+# Let us create the lines to the optimal point
+optlines <- data.frame(key = c("z","z")
+                       , x0 = c(min(R$p)
+                                ,which.min(R$Z)/1000)
+                       , x1 = c(which.min(R$Z)/1000
+                                ,which.min(R$Z)/1000)
+                       , y0 = c(min(R$Z),min(R$Z))
+                       , y1 = c(min(R$Z),0))
 # We draw the optimal point
 plot1 <- plot1 + annotate("text", label="Optimal - 0.367"
                           , x=R$p[which.min(R$Z)]+0.02
@@ -148,7 +157,12 @@ plot1 <- plot1 + annotate("text", label="Optimal - 0.367"
                           , size=12) +
   geom_point(data=R, aes(x=p[which.min(R$Z)], y=min(Z))
              , colour="navyblue"
-             , size=10) 
+             , size=10) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 # We position the legend
 plot1 <- plot1 + theme(legend.position = c(0.6, 0.9))
 # We now export the graphic

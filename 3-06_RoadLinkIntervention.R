@@ -116,6 +116,7 @@ plottau <- ggplot(data=plotres,aes(x=T,y=eta)) +
   geom_line(size=2,color="red") + 
   xlab("Time between Int. [tu]") + 
   ylab("Average cost per year [mu/tu]") + # Set axis labels
+  scale_x_continuous(breaks = seq(0, max(plotres$T), by = 1)) +
   ylim(500,1000) +
   theme_bw(base_size=36) #+
 # theme(legend.position=c(.85, .8))           # Position legend
@@ -129,6 +130,13 @@ names(optimal) <- c("x","y")
 data <- plotres
 optimal[1,1] <- data$T[which.max(data$eta)]
 optimal[1,2] <- max(data$eta)
+optlines <- data.frame(key = c("z","z")
+                       , x0 = c(min(plotres$T)
+                                ,optimal$x)
+                       , x1 = c(optimal$x
+                                ,optimal$x)
+                       , y0 = c(optimal$y,optimal$y)
+                       , y1 = c(optimal$y,500)) # Same as y.min
 
 # Now we add these points to the graph before exporting
 plottau + geom_point(data=optimal
@@ -137,8 +145,13 @@ plottau + geom_point(data=optimal
                      , colour="navyblue"
                      , size=6) +
   annotate("text", label="Optimal - 887\nT=11.0"
-           , x=optimal[1,1]+0.02, y=optimal[1,2]-30
-           , size=12)
+           , x=optimal[1,1]+2, y=optimal[1,2]-40
+           , size=12) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
 dev.copy(png,'E3-06_eta.png',width=2000,height=1330)
 dev.off()

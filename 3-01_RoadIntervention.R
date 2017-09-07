@@ -92,6 +92,14 @@ resultstidy <- gather(results
                       ,eta.CI,eta.PI,eta
                       ,key="key",value="value")
 
+optlines <- data.frame(key = c("z","z")
+                       , x0 = c(min(results$t)
+                                ,which.min(results$eta))
+                       , x1 = c(which.min(results$eta)
+                              ,which.min(results$eta))
+                       , y0 = c(min(results$eta),min(results$eta))
+                       , y1 = c(min(results$eta),0))
+
 ploteta <- ggplot(data=resultstidy,aes(x=t,y=value
                                        ,group=key,color=key)) + 
   geom_line(size=2) + 
@@ -102,14 +110,21 @@ ploteta <- ggplot(data=resultstidy,aes(x=t,y=value
                             , "\nTotal costs\n")
   )  +                  
   scale_linetype_discrete(name="Type of cost") +
+  scale_x_continuous(breaks = seq(0, max(resultstidy$t), by = 1)) +
   xlab("Time between Int. [years]") + 
   ylab("Average cost per year [mu/yr]") + # Set axis labels
   theme_bw(base_size=36) + 
   annotate("text", x = 5, y = 8.25
            , label = "Optimal\neta=7.6 at T=5"
-           ,size=12,color="black")
-ploteta
+           ,size=12,color="black") 
+ploteta +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
+# ploteta
 dev.copy(png,'E3-01_Cost.png',width=2000,height=1330)
 dev.off()
 

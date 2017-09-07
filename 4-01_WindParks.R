@@ -181,6 +181,7 @@ plotetaT <- ggplot(data=rdf,aes(x=k,y=eta)) +
   geom_line(size=2,color="red") + 
   xlab("k - number of failed items [-]") + 
   ylab("Average cost per year [mu/tu]") + # Set axis labels
+  scale_x_continuous(breaks = seq(0, max(rdf$k), by = 1)) +
   ylim(0,1000) +
   theme_bw(base_size=36) 
 
@@ -193,6 +194,14 @@ data <- rdf
 optimal[1,1] <- data$k[which.max(data$eta)]
 optimal[1,2] <- max(data$eta)
 
+optlines <- data.frame(key = c("z","z")
+                       , x0 = c(min(rdf$k)
+                                ,optimal$x)
+                       , x1 = c(optimal$x
+                                ,optimal$x)
+                       , y0 = c(optimal$y,optimal$y)
+                       , y1 = c(optimal$y,0))
+
 # Now we add these points to the graph before exporting
 plotetaT + geom_point(data=optimal
                       , aes(x=x
@@ -200,11 +209,16 @@ plotetaT + geom_point(data=optimal
                       , colour="navyblue"
                       , size=6) +
   annotate("text", label="Optimal - 688\nk=3"
-           , x=optimal[1,1], y=optimal[1,2]-60
+           , x=optimal[1,1]+1, y=optimal[1,2]-80
            , size=12) +
   annotate("text", label="n=10\nt.dI.i=2\nt.dI.n=1\ntheta=0.02"
            , x=9.5, y=900
-           , size=12)
+           , size=12) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
 
 
@@ -233,6 +247,7 @@ plotetaB <- ggplot(data=rdfBtidy,aes(x=k,y=value
                    labels=c("\nPark A\n"
                             , "\nPark B\n")
   )  +
+  scale_x_continuous(breaks = seq(0, max(rdfBtidy$k), by = 1)) +
   scale_linetype_discrete(name="Wind mill park") +
   xlab("k - number of failed items [-]") + 
   ylab("Average cost per year [mu/tu]") + # Set axis labels
@@ -250,11 +265,20 @@ key <- c("etaA","etaB")
 # This function works for this case since both optimals
 # are found within the non-deleted range, k = (0,5]
 data <- na.omit(rdfB)
-for (i in 1:2)
+for (n in 1:2)
 {
-  optimal[i,1] <- key[i]
-  optimal[i,2] <- na.omit(data$k[which.max(data[,i+1])])
-  optimal[i,3] <- max(data[,i+1])
+  optimal[n,1] <- key[n]
+  optimal[n,2] <- na.omit(data$k[which.max(data[,n+1])])
+  optimal[n,3] <- max(data[,n+1])
+  opt <- data.frame(key = c("z","z")
+                    , x0 = c(min(data$k)
+                             ,optimal$x[n])
+                    , x1 = c(optimal$x[n]
+                             ,optimal$x[n])
+                    , y0 = c(optimal$y[n],optimal$y[n])
+                    , y1 = c(optimal$y[n],0))
+  if      (n==1) { optlines <- opt} 
+  else if (n!=1) { optlines <- rbind(optlines,opt)}
 }
 
 # Now we add these points to the graph before exporting
@@ -264,11 +288,16 @@ plotetaB + geom_point(data=optimal
                       , colour="navyblue"
                       , size=6) +
   annotate("text", label="Optimal B - 688\nk=3"
-           , x=optimal[2,2], y=optimal[2,3]-60
+           , x=optimal[2,2]+0.75, y=optimal[2,3]-70
            , size=12) +
   annotate("text", label="Optimal A - 384\nk=1"
-           , x=optimal[1,2]+0.5, y=optimal[1,3]-60
-           , size=12)
+           , x=optimal[1,2]+0.75, y=optimal[1,3]-70
+           , size=12) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
 
 
@@ -297,6 +326,7 @@ plotchiB <- ggplot(data=rdfBchitidy,aes(x=k,y=value
                             , "\nPark B\n")
   )  +
   scale_linetype_discrete(name="Wind mill park") +
+  scale_x_continuous(breaks = seq(0, max(rdfBchitidy$k), by = 1)) +
   xlab("k - number of failed items [-]") + 
   ylab("Efficiency [-]") + # Set axis labels
   ylim(0,1) +
@@ -313,11 +343,20 @@ key <- c("chiA","chiB")
 # This function works for this case since both optimals
 # are found within the non-deleted range, k = (0,5]
 data <- na.omit(rdfBchi)
-for (i in 1:2)
+for (n in 1:2)
 {
-  optimal[i,1] <- key[i]
-  optimal[i,2] <- na.omit(data$k[which.max(data[,i+1])])
-  optimal[i,3] <- max(data[,i+1])
+  optimal[n,1] <- key[n]
+  optimal[n,2] <- na.omit(data$k[which.max(data[,n+1])])
+  optimal[n,3] <- max(data[,n+1])
+  opt <- data.frame(key = c("z","z")
+                    , x0 = c(min(data$k)
+                             ,optimal$x[n])
+                    , x1 = c(optimal$x[n]
+                             ,optimal$x[n])
+                    , y0 = c(optimal$y[n],optimal$y[n])
+                    , y1 = c(optimal$y[n],0))
+  if      (n==1) { optlines <- opt} 
+  else if (n!=1) { optlines <- rbind(optlines,opt)}
 }
 
 # Now we add these points to the graph before exporting
@@ -331,7 +370,12 @@ plotchiB + geom_point(data=optimal
            , size=12) +
   annotate("text", label="Optimal A - 0.755\nk=1"
            , x=optimal[1,2]+0.5, y=optimal[1,3]+0.060
-           , size=12)
+           , size=12) +
+  geom_segment(aes(x = x0, y = y0
+                   , xend = x1, yend = y1)
+               , data = optlines
+               , size = 1.5
+               , color= "grey") # Also draw lines to optimal point
 
 
 
@@ -361,6 +405,7 @@ plotC <- ggplot(data=rdfCtidy,aes(x=k,y=value
                             , "\nt.dI.i=5\n")
   )  +
   scale_linetype_discrete(name="Set-up time") +
+  scale_x_continuous(breaks = seq(0, max(rdfCtidy$k), by = 1)) +
   xlab("k - number of failed items [-]") + 
   ylab("Average cost per year [mu/tu]") + # Set axis labels
   ylim(0,1000) +
@@ -417,6 +462,7 @@ plotD <- ggplot(data=rdfDtidy,aes(x=k,y=value
                              , "\nt.dI.n=4.0\n")
   )  +
   scale_linetype_discrete(name="Repair time") +
+  scale_x_continuous(breaks = seq(0, max(rdfDtidy$k), by = 1)) +
   xlab("k - number of failed items [-]") + 
   ylab("Average cost per year [mu/tu]") + # Set axis labels
   ylim(0,1000) +
